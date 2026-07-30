@@ -27,6 +27,4 @@ public class TaskException {
     public ResponseEntity erro400Json(HttpMessageNotReadableException exception){
         return ResponseEntity.status(400).body("Erro ao receber dados via Json, verificar dados novamente");
     }
-
-
 }
