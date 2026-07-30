@@ -32,7 +32,8 @@ public class TaskModel {
     @Column(name = "data_criacao", nullable = false, updatable = false)
     private LocalDateTime dataCriacao;
 
-    public void perPersist() {
+    @PrePersist
+    public void prePersist() {
         this.dataCriacao = LocalDateTime.now();
         if (this.status == null) {
             this.status = StatusEnum.A_FAZER;

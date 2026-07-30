@@ -16,7 +16,6 @@ public class TaskService {
 
     public TaskModel salvar(TaskDto dto) {
         TaskModel task = new TaskModel();
-        task.setDataCriacao(dto.dataCricacao());
         task.setTitulo(dto.titulo());
         task.setDescricao(dto.descricao());
         task.setStatus(dto.status());
