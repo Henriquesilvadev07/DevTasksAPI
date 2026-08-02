@@ -3,7 +3,6 @@ package com.rickdev.DevTasks.Service;
 import com.rickdev.DevTasks.Dto.UserDto;
 import com.rickdev.DevTasks.Model.UserModel;
 import com.rickdev.DevTasks.Repository.UserRepository;
-import com.rickdev.DevTasks.Security.SecurityBeanConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
