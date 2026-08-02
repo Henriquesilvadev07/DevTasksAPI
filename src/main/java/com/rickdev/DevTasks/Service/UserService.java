@@ -26,7 +26,6 @@ public class UserService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("Usuario não encontrado");
         }
-
         return user;
     }
 
@@ -37,4 +36,22 @@ public class UserService implements UserDetailsService {
         user.setSenha(senhaCriptografada);
         userRepository.save(user);
     }
+
+    public void atualizarPorId(Long id, UserDto dto) {
+        var user = userRepository.findById(id).orElseThrow(() ->
+                new RuntimeException("Id nao encontrado"));
+        user.setLogin(dto.login());
+        String senhaCriptografada = securityBeanConfig.passwordEncoder().encode(dto.senha());
+        user.setLogin(senhaCriptografada);
+        userRepository.saveAndFlush(user);
+    }
+
+    public void deletarPorId(Long id){
+        if (userRepository.existsById(id)) {
+            userRepository.deleteById(id);
+        }else {
+            throw new RuntimeException("Id Nao identificado");
+        }
+    }
+
 }
