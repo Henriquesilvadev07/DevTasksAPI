@@ -16,6 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@CrossOrigin("*")
 public class UserController {
 
     private final UserService userService;
@@ -32,7 +33,7 @@ public class UserController {
         return ResponseEntity.ok(new TokenJwtDto (JWTtoken));
     }
 
-    @PostMapping("/cadastro")
+    @PostMapping("/registro")
     public ResponseEntity<UserModel> cadastro(@RequestBody @Valid UserDto dto, UriComponentsBuilder uriBuilder) {
         var user = userService.cadastrar(dto);
         var uri = uriBuilder.path("/auth/{id}").buildAndExpand(user.getId()).toUri();

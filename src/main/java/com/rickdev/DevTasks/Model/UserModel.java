@@ -11,9 +11,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-@Entity(name = "Usuarios")
+@Entity
 @Data
-@Table(name = "users")
+@Table(name = "\"user\"")
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserModel implements UserDetails {

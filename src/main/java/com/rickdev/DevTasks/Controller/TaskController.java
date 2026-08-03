@@ -14,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/task")
 @RequiredArgsConstructor
+@CrossOrigin("*")
 public class TaskController {
 
 
@@ -29,13 +30,13 @@ public class TaskController {
     @GetMapping
     public ResponseEntity<List<TaskModel>> listar(){
         var task = taskService.listarTodos();
-        return ResponseEntity.status(201).body(task);
+        return ResponseEntity.status(200).body(task);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<TaskModel> acharPorId(@PathVariable Long id){
         var task = taskService.acharPorId(id);
-        return ResponseEntity.status(201).body(task);
+        return ResponseEntity.status(200).body(task);
     }
 
     @PutMapping("/{id}")
