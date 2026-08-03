@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RickHub - Secure Code Management</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0d1117; color: #8b949e; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-cyan-500 selection:text-black">
+
+<!-- Container de Toasts Flutuantes -->
+<div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3"></div>
+
+<!-- TELA DE LOGIN -->
+<div id="view-login" class="flex-1 flex items-center justify-center p-4">
+    <div class="w-full max-w-[340px] bg-[#161b22] border border-[#30363d] rounded-xl p-6 shadow-2xl">
+        <div class="text-center mb-6">
+            <!-- Paródia da Logo do GitHub (Octocat estilizado com as iniciais RH) -->
+            <div class="w-12 h-12 mx-auto bg-[#21262d] border border-[#30363d] rounded-full flex items-center justify-center text-white font-black text-lg mb-3 shadow-md tracking-wider">
+                <span class="text-cyan-400">R</span><span class="text-white">H</span>
+            </div>
+            <h1 class="text-xl font-normal text-white tracking-tight">Sign in to RickHub</h1>
+        </div>
+        <div class="bg-[#0d1117] border border-[#30363d] rounded-lg p-4 space-y-4 shadow-inner">
+            <div>
+                <label class="block text-xs font-medium text-slate-200 mb-1">Username or email address</label>
+                <input type="email" id="login-email" placeholder="dev@rickhub.com" class="w-full px-3 py-1.5 rounded-md bg-[#161b22] border border-[#30363d] text-white text-xs focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500">
+            </div>
+            <div>
+                <div class="flex justify-between items-center mb-1">
+                    <label class="block text-xs font-medium text-slate-200">Password</label>
+                </div>
+                <input type="password" id="login-senha" placeholder="••••••••" class="w-full px-3 py-1.5 rounded-md bg-[#161b22] border border-[#30363d] text-white text-xs focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500">
+            </div>
+            <button onclick="fazerLogin()" class="w-full py-1.5 px-4 bg-[#238636] hover:bg-[#2ea043] text-white font-medium rounded-md text-xs transition-all shadow-sm active:scale-[0.98]">Sign in</button>
+            <div id="msg-login" class="text-xs text-center mt-1"></div>
+        </div>
+        <div class="text-center mt-4 text-xs text-slate-400 border border-[#30363d] rounded-lg p-3 bg-[#161b22]/50">
+            New to RickHub? <a onclick="mudarParaCadastro()" class="text-cyan-400 hover:underline cursor-pointer font-medium">Create an account</a>.
+        </div>
+    </div>
+</div>
+
+<!-- TELA DE CADASTRO -->
+<div id="view-cadastro" class="flex-1 flex items-center justify-center p-4 hidden">
+    <div class="w-full max-w-[340px] bg-[#161b22] border border-[#30363d] rounded-xl p-6 shadow-2xl">
+        <div class="text-center mb-6">
+            <div class="w-12 h-12 mx-auto bg-[#21262d] border border-[#30363d] rounded-full flex items-center justify-center text-white font-black text-lg mb-3 shadow-md tracking-wider">
+                <span class="text-cyan-400">R</span><span class="text-white">H</span>
+            </div>
+            <h1 class="text-xl font-normal text-white tracking-tight">Join RickHub</h1>
+        </div>
+        <div id="reg-flash-error" class="p-3 mb-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs text-center hidden"></div>
+        <div class="bg-[#0d1117] border border-[#30363d] rounded-lg p-4 space-y-4 shadow-inner">
+            <div>
+                <label class="block text-xs font-medium text-slate-200 mb-1">E-mail</label>
+                <input type="email" id="reg-email" placeholder="dev@rickhub.com" class="w-full px-3 py-1.5 rounded-md bg-[#161b22] border border-[#30363d] text-white text-xs focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-200 mb-1">Password</label>
+                <input type="password" id="reg-senha" placeholder="••••••••" class="w-full px-3 py-1.5 rounded-md bg-[#161b22] border border-[#30363d] text-white text-xs focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500">
+            </div>
+            <button onclick="fazerCadastro()" class="w-full py-1.5 px-4 bg-[#238636] hover:bg-[#2ea043] text-white font-medium rounded-md text-xs transition-all shadow-sm active:scale-[0.98]">Create account</button>
+        </div>
+        <div class="text-center mt-4 text-xs text-slate-400 border border-[#30363d] rounded-lg p-3 bg-[#161b22]/50">
+            Already have an account? <a onclick="mudarParaLogin()" class="text-cyan-400 hover:underline cursor-pointer font-medium">Sign in</a>.
+        </div>
+    </div>
+</div>
+
+<!-- TELA PRINCIPAL (DASHBOARD ESTILO GITHUB) -->
+<div id="view-dashboard" class="flex-1 flex flex-col hidden">
+
+    <!-- HEADER SUPERIOR -->
+    <header class="bg-[#161b22] border-b border-[#30363d] px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-[#21262d] border border-[#30363d] rounded-full flex items-center justify-center text-white font-black text-xs shadow">
+                <span class="text-cyan-400">R</span><span class="text-white">H</span>
+            </div>
+            <span class="text-xs font-semibold text-white flex items-center gap-1.5">
+                    <span id="nav-workspace-label" class="text-slate-300">workspace</span> / <strong class="text-white">secure-core</strong>
+                </span>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <img id="nav-user-avatar" src="" onclick="abrirModalPerfil()" class="w-7 h-7 rounded-full border border-[#30363d] cursor-pointer object-cover bg-[#21262d]" title="Editar Perfil">
+            <button onclick="fazerLogout()" class="text-xs bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-slate-200 px-3 py-1 rounded-md font-medium transition-all">Sign out</button>
+        </div>
+    </header>
+
+    <!-- SUB-MENU DE NAVEGAÇÃO -->
+    <div class="bg-[#161b22] border-b border-[#30363d] px-6 flex gap-6 text-xs text-slate-400 overflow-x-auto">
+        <div class="py-2.5 flex items-center gap-1.5 border-b-2 border-[#f78166] text-white font-medium cursor-pointer">
+            <span>issues</span> <span id="badge-total-tasks" class="bg-[#30363d] text-slate-200 px-1.5 py-0.2 rounded-full text-[10px]">0</span>
+        </div>
+        <div class="py-2.5 flex items-center gap-1.5 hover:text-white cursor-pointer transition-colors">Pull requests</div>
+        <div class="py-2.5 flex items-center gap-1.5 hover:text-white cursor-pointer transition-colors">Security audit</div>
+        <div class="py-2.5 flex items-center gap-1.5 hover:text-white cursor-pointer transition-colors">Settings</div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL (SIDEBAR + LISTAGEM) -->
+    <div class="flex-1 max-w-[1280px] w-full mx-auto p-6 grid grid-cols-1 md:grid-cols-4 gap-6">
+
+        <!-- SIDEBAR ESQUERDA -->
+        <div class="md:col-span-1 space-y-6 text-xs">
+            <div class="space-y-1">
+                <div class="text-slate-400 font-semibold px-1 mb-2 uppercase tracking-wider text-[10px]">Filter Issues</div>
+                <a class="block px-3 py-1.5 rounded-md bg-[#21262d] text-white font-medium border border-[#30363d]">Open issues</a>
+                <a class="block px-3 py-1.5 rounded-md text-slate-400 hover:bg-[#21262d]/50 hover:text-white cursor-pointer transition-all">Your repositories</a>
+            </div>
+
+            <div class="border-t border-[#30363d] pt-4"></div>
+
+            <!-- CARD DE PERFIL -->
+            <div class="bg-[#161b22] border border-[#30363d] rounded-xl p-4">
+                <div class="flex items-center gap-3 mb-3">
+                    <img id="sidebar-mini-avatar" src="" class="w-8 h-8 rounded-full border border-[#30363d] object-cover bg-[#21262d]">
+                    <div class="overflow-hidden">
+                        <div id="sidebar-email" class="text-white font-medium truncate text-xs">user@rickhub.com</div>
+                        <div class="text-[10px] text-emerald-400 flex items-center gap-1 mt-0.5">● Connected (JWT)</div>
+                    </div>
+                </div>
+                <p id="sidebar-bio" class="text-[11px] text-slate-400 italic mb-3 line-clamp-2">No bio configured.</p>
+                <button onclick="abrirModalPerfil()" class="w-full py-1 bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-slate-200 rounded-md text-[11px] font-medium transition-all">Edit profile</button>
+            </div>
+        </div>
+
+        <!-- CONTEÚDO PRINCIPAL (DIREITA) -->
+        <div class="md:col-span-3 flex flex-col gap-4">
+
+            <!-- BARRA DE BUSCA E AÇÃO -->
+            <div class="flex flex-wrap justify-between items-center gap-3">
+                <div class="flex-1 min-w-[240px] flex items-center bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-1.5 text-xs text-slate-400">
+                    <span class="mr-2">🔍</span>
+                    <span class="text-cyan-400 font-mono bg-cyan-500/10 px-1.5 py-0.5 rounded text-[11px] mr-2 border border-cyan-500/20">is:open</span>
+                    <span id="search-filter-label" class="text-slate-300">filtered by active status</span>
+                </div>
+                <button onclick="toggleNovaTaskForm()" class="bg-[#238636] hover:bg-[#2ea043] text-white font-medium px-3.5 py-1.5 rounded-md text-xs transition-all shadow-sm flex items-center gap-1.5 active:scale-95">
+                    <span>New issue</span>
+                </button>
+            </div>
+
+            <!-- FORMULÁRIO DE NOVA TAREFA -->
+            <div id="form-new-issue" class="bg-[#161b22] border border-[#30363d] rounded-lg p-4 hidden shadow-xl">
+                <div class="flex justify-between items-center mb-3 pb-2 border-b border-[#30363d]">
+                    <h3 class="text-xs font-semibold text-white uppercase tracking-wider">Create new issue</h3>
+                    <span onclick="toggleNovaTaskForm()" class="cursor-pointer text-slate-400 hover:text-white text-xs">✕</span>
+                </div>
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <label class="block text-slate-300 mb-1 font-medium">Title</label>
+                        <input type="text" id="new-issue-titulo" placeholder="Ex: Fix security vulnerability in auth filter" class="w-full px-3 py-1.5 rounded-md bg-[#0d1117] border border-[#30363d] text-white focus:outline-none focus:border-cyan-500">
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 mb-1 font-medium">Leave a comment</label>
+                        <textarea id="new-issue-descricao" placeholder="Describe the issue details... (Ctrl + Enter to submit)" onkeydown="checarAtalhoSubmit(event)" class="w-full px-3 py-1.5 rounded-md bg-[#0d1117] border border-[#30363d] text-white h-24 resize-none focus:outline-none focus:border-cyan-500"></textarea>
+                    </div>
+                    <div class="flex justify-end gap-2 pt-1">
+                        <button onclick="toggleNovaTaskForm()" class="px-3 py-1 bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-slate-300 rounded-md">Cancel</button>
+                        <button onclick="criarIssue()" class="px-3 py-1 bg-[#238636] hover:bg-[#2ea043] text-white font-medium rounded-md shadow-sm">Submit new issue</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABELA DE ISSUES -->
+            <div class="bg-[#161b22] border border-[#30363d] rounded-lg overflow-hidden flex flex-col shadow-lg">
+
+                <!-- ABAS OPEN / CLOSED -->
+                <div class="bg-[#161b22] px-4 py-3 border-b border-[#30363d] flex justify-between items-center text-xs">
+                    <div class="flex items-center gap-5">
+                        <button id="tab-open" onclick="mudarAbaIssues('OPEN')" class="flex items-center gap-1.5 text-white font-semibold cursor-pointer">
+                            🟢 <span id="count-open">0</span> Open
+                        </button>
+                        <button id="tab-closed" onclick="mudarAbaIssues('CLOSED')" class="flex items-center gap-1.5 text-slate-400 hover:text-white font-normal cursor-pointer">
+                            🟣 <span id="count-closed">0</span> Closed
+                        </button>
+                    </div>
+                    <div class="text-slate-500 hidden sm:block text-[11px]">Author / Updated</div>
+                </div>
+
+                <!-- LISTA DE ITENS -->
+                <div id="issues-list-container" class="divide-y divide-[#30363d]">
+                    <div class="p-8 text-center text-slate-500 text-xs">Loading issues...</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DE DETALHES -->
+<div id="issue-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-lg p-5 shadow-2xl">
+        <div class="flex justify-between items-center border-b border-[#30363d] pb-3 mb-4">
+            <h3 id="modal-issue-title" class="text-xs font-semibold text-white">Title</h3>
+            <span onclick="fecharModalIssue()" class="cursor-pointer text-slate-400 hover:text-white">✕</span>
+        </div>
+        <div id="modal-issue-desc" class="p-3.5 rounded-md bg-[#0d1117] border border-[#30363d] text-xs text-slate-300 min-h-[80px] mb-6 whitespace-pre-wrap"></div>
+        <div class="flex justify-between items-center">
+            <div id="modal-actions-container"></div>
+            <button onclick="fecharModalIssue()" class="px-3 py-1 bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-slate-300 text-xs rounded-md">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DE PERFIL -->
+<div id="profile-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-md p-5 shadow-2xl">
+        <div class="flex justify-between items-center border-b border-[#30363d] pb-3 mb-4">
+            <h3 class="text-xs font-semibold text-white uppercase tracking-wider">Edit Developer Profile</h3>
+            <span onclick="fecharModalPerfil()" class="cursor-pointer text-slate-400 hover:text-white">✕</span>
+        </div>
+        <div class="flex flex-col items-center mb-4">
+            <img id="profile-modal-avatar-preview" src="" class="w-14 h-14 rounded-full border border-[#30363d] object-cover mb-2 bg-[#21262d] shadow">
+            <span id="profile-modal-email" class="text-xs text-slate-400"></span>
+        </div>
+        <div class="space-y-3 text-xs">
+            <div>
+                <label class="block text-slate-300 mb-1 font-medium">Avatar Image URL</label>
+                <input type="text" id="profile-input-avatar" placeholder="https://exemplo.com/foto.jpg" class="w-full px-3 py-1.5 rounded-md bg-[#0d1117] border border-[#30363d] text-white focus:outline-none focus:border-cyan-500">
+            </div>
+            <div>
+                <label class="block text-slate-300 mb-1 font-medium">Bio / Tech Stack</label>
+                <textarea id="profile-input-bio" placeholder="Ex: Backend Dev | Spring Security & Java" class="w-full px-3 py-1.5 rounded-md bg-[#0d1117] border border-[#30363d] text-white h-20 resize-none focus:outline-none focus:border-cyan-500"></textarea>
+            </div>
+        </div>
+        <div class="flex justify-end gap-2 mt-6">
+            <button onclick="fecharModalPerfil()" class="px-3 py-1 bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-slate-300 text-xs rounded-md">Cancel</button>
+            <button onclick="salvarPerfil()" class="px-3 py-1 bg-[#238636] hover:bg-[#2ea043] text-white font-medium text-xs rounded-md shadow-sm">Save changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- SCRIPTS -->
+<script>
+    const API_URL = 'http://localhost:8080';
+    let currentTab = 'OPEN';
+    let allTasksCache = [];
+
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            fecharModalIssue();
+            fecharModalPerfil();
+            document.getElementById('form-new-issue').classList.add('hidden');
+        }
+    });
+
+    function mostrarToast(mensagem, tipo = 'success') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `p-3 rounded-md text-xs font-medium flex items-center gap-2 shadow-xl border backdrop-blur-md ${
+            tipo === 'success'
+                ? 'bg-[#161b22] border-[#30363d] text-emerald-400'
+                : 'bg-[#161b22] border-red-500/30 text-red-400'
+        }`;
+        toast.innerHTML = `<span>${tipo === 'success' ? '🟢' : '🔴'}</span> ${mensagem}`;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 3500);
+    }
+
+    function mudarParaCadastro() {
+        document.getElementById('reg-flash-error').classList.add('hidden');
+        document.getElementById('view-login').classList.add('hidden');
+        document.getElementById('view-cadastro').classList.remove('hidden');
+    }
+
+    function mudarParaLogin() {
+        document.getElementById('view-cadastro').classList.add('hidden');
+        document.getElementById('view-login').classList.remove('hidden');
+    }
+
+    async function fazerCadastro() {
+        const login = document.getElementById('reg-email').value;
+        const senha = document.getElementById('reg-senha').value;
+        const flashError = document.getElementById('reg-flash-error');
+        flashError.classList.add('hidden');
+
+        try {
+            const res = await fetch(`${API_URL}/auth/registro`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ login, senha })
+            });
+            if(res.ok) {
+                mostrarToast("Account created successfully!");
+                mudarParaLogin();
+            } else {
+                flashError.textContent = "User already exists or invalid data.";
+                flashError.classList.remove('hidden');
+            }
+        } catch(e) {
+            flashError.textContent = "Server connection error.";
+            flashError.classList.remove('hidden');
+        }
+    }
+
+    async function fazerLogin() {
+        const login = document.getElementById('login-email').value;
+        const senha = document.getElementById('login-senha').value;
+        const msg = document.getElementById('msg-login');
+
+        try {
+            const res = await fetch(`${API_URL}/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ login, senha })
+            });
+
+            if(res.ok) {
+                const data = await res.json();
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('userEmail', login);
+
+                document.getElementById('view-login').classList.add('hidden');
+                document.getElementById('view-cadastro').classList.add('hidden');
+                document.getElementById('view-dashboard').classList.remove('hidden');
+
+                carregarDadosPerfil(login);
+                carregarIssues();
+                mostrarToast("Authenticated successfully via JWT!");
+            } else {
+                throw new Error();
+            }
+        } catch(e) {
+            msg.className = "text-xs text-center mt-1 text-red-400";
+            msg.textContent = "Invalid username or password.";
+        }
+    }
+
+    function fazerLogout() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userEmail');
+        document.getElementById('view-dashboard').classList.add('hidden');
+        document.getElementById('view-login').classList.remove('hidden');
+        mostrarToast("Signed out.");
+    }
+
+    function toggleNovaTaskForm() {
+        const form = document.getElementById('form-new-issue');
+        form.classList.toggle('hidden');
+        if(!form.classList.contains('hidden')) {
+            document.getElementById('new-issue-titulo').focus();
+        }
+    }
+
+    function checarAtalhoSubmit(e) {
+        if (e.ctrlKey && e.key === 'Enter') {
+            criarIssue();
+        }
+    }
+
+    async function carregarIssues() {
+        const token = localStorage.getItem('token');
+        const container = document.getElementById('issues-list-container');
+
+        try {
+            const res = await fetch(`${API_URL}/task`, {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if(res.ok) {
+                allTasksCache = await res.json();
+                renderizarLista();
+            } else {
+                container.innerHTML = '<div class="p-6 text-center text-red-400 text-xs">Session expired. Please sign in again.</div>';
+            }
+        } catch(e) {
+            container.innerHTML = '<div class="p-6 text-center text-red-400 text-xs">Error connecting to backend API.</div>';
+        }
+    }
+
+    function mudarAbaIssues(tab) {
+        currentTab = tab;
+        const openBtn = document.getElementById('tab-open');
+        const closedBtn = document.getElementById('tab-closed');
+        const searchFilter = document.getElementById('search-filter-label');
+
+        if (tab === 'OPEN') {
+            openBtn.className = "flex items-center gap-1.5 text-white font-semibold cursor-pointer";
+            closedBtn.className = "flex items-center gap-1.5 text-slate-400 hover:text-white font-normal cursor-pointer";
+            searchFilter.textContent = "filtered by active status";
+        } else {
+            closedBtn.className = "flex items-center gap-1.5 text-white font-semibold cursor-pointer";
+            openBtn.className = "flex items-center gap-1.5 text-slate-400 hover:text-white font-normal cursor-pointer";
+            searchFilter.textContent = "filtered by closed status";
+        }
+        renderizarLista();
+    }
+
+    function renderizarLista() {
+        const container = document.getElementById('issues-list-container');
+
+        const filtradas = allTasksCache.filter(t => {
+            const status = t.status || 'A_FAZER';
+            if (currentTab === 'OPEN') {
+                return status === 'A_FAZER' || status === 'EM_ANDAMENTO';
+            } else {
+                return status === 'CONCLUIDO';
+            }
+        });
+
+        const openCount = allTasksCache.filter(t => (t.status || 'A_FAZER') !== 'CONCLUIDO').length;
+        const closedCount = allTasksCache.filter(t => (t.status || 'A_FAZER') === 'CONCLUIDO').length;
+
+        document.getElementById('count-open').textContent = openCount;
+        document.getElementById('count-closed').textContent = closedCount;
+        document.getElementById('badge-total-tasks').textContent = openCount;
+
+        if (filtradas.length === 0) {
+            container.innerHTML = `
+                <div class="p-12 text-center text-slate-500 flex flex-col items-center gap-2">
+                    <span class="text-2xl">📂</span>
+                    <p class="text-slate-300 text-xs font-medium">No issues found.</p>
+                    <p class="text-[11px]">Use the "New issue" button above to add one.</p>
+                </div>`;
+            return;
+        }
+
+        container.innerHTML = '';
+        filtradas.forEach(t => {
+            const status = t.status || 'A_FAZER';
+            const icone = status === 'CONCLUIDO' ? '🟣' : '🟢';
+            const dataFormatada = t.dataCriacao ? new Date(t.dataCriacao).toLocaleDateString('pt-BR') : '';
+
+            container.innerHTML += `
+                <div class="p-3.5 px-4 flex items-center gap-3 hover:bg-[#21262d]/40 transition-colors cursor-pointer group" onclick='abrirDetalhesIssue(${JSON.stringify(t)})'>
+                    <span class="text-sm">${icone}</span>
+                    <div class="flex-1 flex flex-col gap-0.5">
+                        <span class="text-xs font-semibold text-slate-200 group-hover:text-cyan-400 transition-colors">${t.titulo}</span>
+                        <span class="text-[11px] text-slate-500">#${t.id} opened on ${dataFormatada}</span>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    async function criarIssue() {
+        const token = localStorage.getItem('token');
+        const titulo = document.getElementById('new-issue-titulo').value;
+        const descricao = document.getElementById('new-issue-descricao').value;
+
+        if (!titulo.trim()) {
+            mostrarToast("Issue title is required!", "error");
+            return;
+        }
+
+        try {
+            const res = await fetch(`${API_URL}/task`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ titulo, descricao, status: 'A_FAZER' })
+            });
+
+            if(res.ok) {
+                document.getElementById('new-issue-titulo').value = '';
+                document.getElementById('new-issue-descricao').value = '';
+                toggleNovaTaskForm();
+                carregarIssues();
+                mostrarToast("New issue created successfully!");
+            } else {
+                mostrarToast("Error creating issue.", "error");
+            }
+        } catch(e) {
+            mostrarToast("Connection error.", "error");
+        }
+    }
+
+    function abrirDetalhesIssue(task) {
+        document.getElementById('modal-issue-title').textContent = `${task.titulo} (#${task.id})`;
+        document.getElementById('modal-issue-desc').textContent = task.descricao || 'No description provided.';
+
+        const actionsContainer = document.getElementById('modal-actions-container');
+        actionsContainer.innerHTML = '';
+
+        const status = task.status || 'A_FAZER';
+        if (status !== 'CONCLUIDO') {
+            actionsContainer.innerHTML = `<button onclick="fecharIssue(${task.id}, '${task.titulo.replace(/'/g, "\\'")}', '${(task.descricao || '').replace(/'/g, "\\'")}')" class="px-3.5 py-1 bg-[#238636] hover:bg-[#2ea043] text-white text-xs font-medium rounded-md transition-all shadow-sm">Close issue</button>`;
+        } else {
+            actionsContainer.innerHTML = `<button onclick="deletarIssue(${task.id})" class="px-3.5 py-1 bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 text-xs font-medium rounded-md transition-all">Delete permanently</button>`;
+        }
+
+        document.getElementById('issue-modal').classList.remove('hidden');
+    }
+
+    function fecharModalIssue() {
+        document.getElementById('issue-modal').classList.add('hidden');
+    }
+
+    async function fecharIssue(id, titulo, descricao) {
+        const token = localStorage.getItem('token');
+        try {
+            const res = await fetch(`${API_URL}/task/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ titulo, descricao, status: 'CONCLUIDO' })
+            });
+
+            if(res.ok) {
+                fecharModalIssue();
+                carregarIssues();
+                mostrarToast("Issue closed!");
+            } else {
+                mostrarToast("Error updating issue.", "error");
+            }
+        } catch(e) {
+            mostrarToast("Connection error.", "error");
+        }
+    }
+
+    async function deletarIssue(id) {
+        const token = localStorage.getItem('token');
+        if(!confirm('Are you sure you want to delete this issue?')) return;
+
+        try {
+            const res = await fetch(`${API_URL}/task/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if(res.ok) {
+                fecharModalIssue();
+                carregarIssues();
+                mostrarToast("Issue deleted.");
+            } else {
+                mostrarToast("Error deleting issue.", "error");
+            }
+        } catch(e) {
+            mostrarToast("Connection error.", "error");
+        }
+    }
+
+    // PERFIL
+    function abrirModalPerfil() {
+        const email = localStorage.getItem('userEmail') || 'user@rickhub.com';
+        const savedProfile = JSON.parse(localStorage.getItem(`profile_${email}`)) || { avatar: '', bio: '' };
+
+        document.getElementById('profile-modal-email').textContent = email;
+        document.getElementById('profile-input-avatar').value = savedProfile.avatar;
+        document.getElementById('profile-input-bio').value = savedProfile.bio;
+        document.getElementById('profile-modal-avatar-preview').src = savedProfile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150';
+
+        document.getElementById('profile-modal').classList.remove('hidden');
+    }
+
+    function fecharModalPerfil() {
+        document.getElementById('profile-modal').classList.add('hidden');
+    }
+
+    function salvarPerfil() {
+        const email = localStorage.getItem('userEmail');
+        const avatar = document.getElementById('profile-input-avatar').value;
+        const bio = document.getElementById('profile-input-bio').value;
+
+        localStorage.setItem(`profile_${email}`, JSON.stringify({ avatar, bio }));
+        carregarDadosPerfil(email);
+        fecharModalPerfil();
+        mostrarToast("Profile updated successfully!");
+    }
+
+    function carregarDadosPerfil(email) {
+        const savedProfile = JSON.parse(localStorage.getItem(`profile_${email}`)) || { avatar: '', bio: '' };
+        const workspaceName = email.split('@')[0];
+        document.getElementById('nav-workspace-label').textContent = workspaceName;
+        document.getElementById('sidebar-email').textContent = email;
+
+        const defaultAvatar = savedProfile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150';
+        document.getElementById('nav-user-avatar').src = defaultAvatar;
+        document.getElementById('sidebar-mini-avatar').src = defaultAvatar;
+
+        if (savedProfile.bio) {
+            document.getElementById('sidebar-bio').textContent = savedProfile.bio;
+        } else {
+            document.getElementById('sidebar-bio').textContent = "No bio configured.";
+        }
+    }
+</script>
+</body>
+</html>
