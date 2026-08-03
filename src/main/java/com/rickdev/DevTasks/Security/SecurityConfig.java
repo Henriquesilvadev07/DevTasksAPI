@@ -31,6 +31,7 @@ public class SecurityConfig {
                         req.requestMatchers("/auth/login").permitAll()
                                 .requestMatchers("/error").permitAll()
                                 .requestMatchers("/auth/registro").permitAll()
+                                .requestMatchers("/", "/*.html", "/css/**", "/js/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

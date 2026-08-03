@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevTasks - GitHub Issues Style</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0d1117; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-blue-500 selection:text-white">
+
+<!-- Container de Toasts Flutuantes -->
+<div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3"></div>
+
+<!-- TELA DE LOGIN -->
+<div id="view-login" class="flex-1 flex items-center justify-center p-4">
+    <div class="w-full max-w-[340px] bg-[#161b22] border border-[#30363d] rounded-md p-5 shadow-2xl">
+        <div class="text-center mb-6">
+            <svg class="w-10 h-10 mx-auto fill-white mb-2" viewBox="0 0 16 16"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path></svg>
+            <h1 class="text-xl font-normal text-white">Sign in to DevTasks</h1>
+        </div>
+        <div class="bg-[#161b22] border border-[#30363d] rounded-md p-4 space-y-3">
+            <div>
+                <label class="block text-xs font-normal text-white mb-1">Username or email address</label>
+                <input type="email" id="login-email" class="w-full px-3 py-1.5 rounded-md bg-[#0d1117] border border-[#30363d] text-white text-xs focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff]">
+            </div>
+            <div>
+                <label class="block text-xs font-normal text-white mb-1">Password</label>
+                <input type="password" id="login-senha" class="w-full px-3 py-1.5 rounded-md bg-[#0d1117] border border-[#30363d] text-white text-xs focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff]">
+            </div>
+            <button onclick="fazerLogin()" class="w-full mt-2 py-1.5 px-3 bg-[#238636] hover:bg-[#2ea043] text-white font-medium rounded-md text-xs transition-all border border-[rgba(240,246,252,0.1)]">Sign in</button>
+            <div id="msg-login" class="text-xs text-center mt-1"></div>
+        </div>
+        <div class="text-center mt-4 text-xs border border-[#30363d] rounded-md p-3 text-[#8b949e]">
+            New to DevTasks? <a onclick="mudarParaCadastro()" class="text-[#58a6ff] hover:underline cursor-pointer">Create an account</a>.
+        </div>
+    </div>
+</div>
+
+<!-- TELA DE CADASTRO -->
+<div id="view-cadastro" class="flex-1 flex items-center justify-center p-4 hidden">
+    <div class="w-full max-w-[340px] bg-[#161b22] border border-[#30363d] rounded-md p-5 shadow-2xl">
+        <div class="text-center mb-6">
+            <h1 class="text-xl font-normal text-white">Join DevTasks</h1>
+        </div>
+        <div id="reg-flash-error" class="p-3 mb-3 rounded-md bg-red-500/10 border border-red-500/30 text-red-400 text-xs text-center hidden"></div>
+        <div class="bg-[#161b22] border border-[#30363d] rounded-md p-4 space-y-3">
+            <div>
+                <label class="block text-xs font-normal text-white mb-1">E-mail</label>
+                <input type="email" id="reg-email" class="w-full px-3 py-1.5 rounded-md bg-[#0d1117] border border-[#30363d] text-white text-xs focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff]">
+            </div>
+            <div>
+                <label class="block text-xs font-normal text-white mb-1">Password</label>
+                <input type="password" id="reg-senha" class="w-full px-3 py-1.5 rounded-md bg-[#0d1117] border border-[#30363d] text-white text-xs focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff]">
+            </div>
+            <button onclick="fazerCadastro()" class="w-full mt-2 py-1.5 px-3 bg-[#238636] hover:bg-[#2ea043] text-white font-medium rounded-md text-xs transition-all border border-[rgba(240,246,252,0.1)]">Create account</button>
+        </div>
+        <div class="text-center mt-4 text-xs border border-[#30363d] rounded-md p-3 text-[#8b949e]">
+            Already have an account? <a onclick="mudarParaLogin()" class="text-[#58a6ff] hover:underline cursor-pointer">Sign in</a>.
+        </div>
+    </div>
+</div>
+
+<!-- TELA PRINCIPAL (DASHBOARD IDÊNTICO AO GITHUB) -->
+<div id="view-dashboard" class="flex-1 flex flex-col hidden">
+
+    <!-- HEADER SUPERIOR PRETO GITHUB -->
+    <header class="bg-[#161b22] border-b border-[#30363d] px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <svg class="w-8 h-8 fill-white" viewBox="0 0 16 16"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path></svg>
+            <span class="text-sm font-medium text-white flex items-center gap-1.5">
+                    <span id="nav-username-label">rickdev</span> / <strong class="text-white">DevTasksAPI</strong>
+                </span>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <!-- Avatar clicável que abre o Modal de Perfil -->
+            <img id="nav-user-avatar" src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" onclick="abrirModalPerfil()" class="w-7 h-7 rounded-full border border-[#30363d] cursor-pointer object-hover bg-[#21262d]" title="Editar Perfil">
+            <button onclick="fazerLogout()" class="text-xs bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-slate-300 px-2.5 py-1.5 rounded-md font-medium transition-all">Sign out</button>
+        </div>
+    </header>
+
+    <!-- SUB-MENU DE ABAS DO REPOSITÓRIO (Issues, Pull requests, etc) -->
+    <div class="bg-[#161b22] border-b border-[#30363d] px-6 flex gap-6 text-xs text-[#8b949e] overflow-x-auto">
+        <div class="py-3 flex items-center gap-2 border-b-2 border-[#f78166] text-white font-medium cursor-pointer">
+            <span>🔴</span> Issues <span id="badge-total-issues" class="bg-[#30363d] text-white px-1.5 py-0.5 rounded-full text-[10px]">0</span>
+        </div>
+        <div class="py-3 flex items-center gap-1.5 hover:text-white cursor-pointer transition-colors">Pull requests</div>
+        <div class="py-3 flex items-center gap-1.5 hover:text-white cursor-pointer transition-colors">Actions</div>
+        <div class="py-3 flex items-center gap-1.5 hover:text-white cursor-pointer transition-colors">Projects</div>
+        <div class="py-3 flex items-center gap-1.5 hover:text-white cursor-pointer transition-colors">Settings</div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL COM LAYOUT DE DUAS COLUNAS (Sidebar esquerda + Lista direita) -->
+    <div class="flex-1 max-w-[1400px] w-full mx-auto p-6 grid grid-cols-1 md:grid-cols-5 gap-6">
+
+        <!-- SIDEBAR ESQUERDA (ESTILO GITHUB ISSUES) -->
+        <div class="md:col-span-1 space-y-6 text-xs">
+            <div class="space-y-1">
+                <div class="text-[#8b949e] font-semibold px-2 mb-2">Issues</div>
+                <a class="block px-2 py-1.5 rounded-md bg-[#21262d] text-white font-medium">Assigned to me</a>
+                <a class="block px-2 py-1.5 rounded-md text-[#8b949e] hover:bg-[#21262d] hover:text-white cursor-pointer">Created by me</a>
+                <a class="block px-2 py-1.5 rounded-md text-[#8b949e] hover:bg-[#21262d] hover:text-white cursor-pointer">Mentioned</a>
+            </div>
+
+            <hr class="border-[#30363d]">
+
+            <!-- CARD DE PERFIL RÁPIDO NA LATERAL -->
+            <div class="bg-[#161b22] border border-[#30363d] rounded-md p-3">
+                <div class="flex items-center gap-2 mb-2">
+                    <img id="sidebar-mini-avatar" src="" class="w-8 h-8 rounded-full border border-[#30363d] object-cover">
+                    <div class="overflow-hidden">
+                        <div id="sidebar-email" class="text-white font-semibold truncate">dev@github.com</div>
+                        <div class="text-[10px] text-[#8b949e]">Online Dev</div>
+                    </div>
+                </div>
+                <p id="sidebar-bio" class="text-[11px] text-[#8b949e] italic mb-2">Nenhuma bio cadastrada.</p>
+                <button onclick="abrirModalPerfil()" class="w-full py-1 bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-white rounded text-[11px] font-medium">Editar Perfil</button>
+            </div>
+        </div>
+
+        <!-- CONTEÚDO À DIREITA (BUSCA E TABELA DE ISSUES) -->
+        <div class="md:col-span-4 flex flex-col gap-4">
+
+            <!-- TOPO COM BARRA DE PESQUISA E BOTÃO NEW ISSUE -->
+            <div class="flex flex-wrap justify-between items-center gap-3">
+                <!-- Barra de filtro estilo GitHub -->
+                <div class="flex-1 min-w-[260px] flex items-center bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-1.5 text-xs text-[#8b949e]">
+                    <span class="mr-2">🔍</span>
+                    <span class="text-white font-mono bg-[#21262d] px-1 py-0.5 rounded text-[11px] mr-2">is:issue</span>
+                    <span id="search-filter-label" class="text-slate-300">state:open</span>
+                </div>
+                <button onclick="toggleNovaIssueForm()" class="bg-[#238636] hover:bg-[#2ea043] text-white font-semibold px-3 py-1.5 rounded-md text-xs transition-all border border-[rgba(240,246,252,0.1)] flex items-center gap-1 shadow-sm">
+                    <span>New issue</span>
+                </button>
+            </div>
+
+            <!-- FORMULÁRIO DE CRIAR ISSUE (COLAPSÁVEL) -->
+            <div id="form-new-issue" class="bg-[#161b22] border border-[#30363d] rounded-md p-4 hidden">
+                <div class="flex justify-between items-center mb-3 pb-2 border-b border-[#30363d]">
+                    <h3 class="text-sm font-semibold text-white">Create new issue</h3>
+                    <span onclick="toggleNovaIssueForm()" class="cursor-pointer text-[#8b949e] hover:text-white text-xs">✕</span>
+                </div>
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <label class="block text-white mb-1">Title</label>
+                        <input type="text" id="new-issue-titulo" placeholder="Title" class="w-full px-3 py-1.5 rounded-md bg-[#0d1117] border border-[#30363d] text-white focus:outline-none focus:border-[#58a6ff]">
+                    </div>
+                    <div>
+                        <label class="block text-white mb-1">Add a description</label>
+                        <textarea id="new-issue-descricao" placeholder="Leave a comment (Ctrl + Enter para enviar)" onkeydown="checarAtalhoSubmit(event)" class="w-full px-3 py-1.5 rounded-md bg-[#0d1117] border border-[#30363d] text-white h-24 resize-none focus:outline-none focus:border-[#58a6ff]"></textarea>
+                    </div>
+                    <div class="flex justify-end gap-2">
+                        <button onclick="toggleNovaIssueForm()" class="px-3 py-1 bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-white rounded">Cancel</button>
+                        <button onclick="criarIssue()" class="px-3 py-1 bg-[#238636] hover:bg-[#2ea043] text-white font-semibold rounded">Submit new issue</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CAIXA DA LISTA DE ISSUES ESTILO GITHUB -->
+            <div class="bg-[#161b22] border border-[#30363d] rounded-md overflow-hidden flex flex-col">
+
+                <!-- CABEÇALHO DA TABELA (Abas Open / Closed) -->
+                <div class="bg-[#21262d] px-4 py-3 border-b border-[#30363d] flex justify-between items-center text-xs">
+                    <div class="flex items-center gap-4">
+                        <button id="tab-open" onclick="mudarAbaIssues('OPEN')" class="flex items-center gap-1 text-white font-semibold cursor-pointer">
+                            🟢 <span id="count-open">0</span> Open
+                        </button>
+                        <button id="tab-closed" onclick="mudarAbaIssues('CLOSED')" class="flex items-center gap-1 text-[#8b949e] hover:text-white font-normal cursor-pointer">
+                            🟣 <span id="count-closed">0</span> Closed
+                        </button>
+                    </div>
+                    <div class="text-[#8b949e] hidden sm:block">Author / Date</div>
+                </div>
+
+                <!-- LINHAS DAS ISSUES -->
+                <div id="issues-list-container" class="divide-y divide-[#30363d]">
+                    <div class="p-8 text-center text-[#8b949e] text-xs">Carregando issues...</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DE DETALHES DA ISSUE -->
+<div id="issue-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-[#161b22] border border-[#30363d] rounded-lg w-full max-w-lg p-5 shadow-2xl">
+        <div class="flex justify-between items-center border-b border-[#30363d] pb-3 mb-4">
+            <h3 id="modal-issue-title" class="text-sm font-semibold text-white">Título</h3>
+            <span onclick="fecharModalIssue()" class="cursor-pointer text-[#8b949e] hover:text-white">✕</span>
+        </div>
+        <div id="modal-issue-desc" class="p-3 rounded-md bg-[#0d1117] border border-[#30363d] text-xs text-slate-300 min-h-[80px] mb-4 whitespace-pre-wrap"></div>
+        <div class="flex justify-between items-center">
+            <div id="modal-actions-container"></div>
+            <button onclick="fecharModalIssue()" class="px-3 py-1.5 bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-white text-xs rounded-md">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DE PERFIL -->
+<div id="profile-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-[#161b22] border border-[#30363d] rounded-lg w-full max-w-md p-5 shadow-2xl">
+        <div class="flex justify-between items-center border-b border-[#30363d] pb-3 mb-4">
+            <h3 class="text-sm font-semibold text-white">👤 Editar Perfil GitHub Style</h3>
+            <span onclick="fecharModalPerfil()" class="cursor-pointer text-[#8b949e] hover:text-white">✕</span>
+        </div>
+        <div class="flex flex-col items-center mb-4">
+            <img id="profile-modal-avatar-preview" src="" class="w-16 h-16 rounded-full border border-[#30363d] object-cover mb-2 bg-[#21262d]">
+            <span id="profile-modal-email" class="text-xs text-[#8b949e]"></span>
+        </div>
+        <div class="space-y-3 text-xs">
+            <div>
+                <label class="block text-white mb-1">URL da Foto de Perfil (Avatar)</label>
+                <input type="text" id="profile-input-avatar" placeholder="https://exemplo.com/foto.jpg" class="w-full px-3 py-1.5 rounded-md bg-[#0d1117] border border-[#30363d] text-white focus:outline-none focus:border-[#58a6ff]">
+            </div>
+            <div>
+                <label class="block text-white mb-1">Bio / Descrição</label>
+                <textarea id="profile-input-bio" placeholder="Escreva algo sobre você..." class="w-full px-3 py-1.5 rounded-md bg-[#0d1117] border border-[#30363d] text-white h-20 resize-none focus:outline-none focus:border-[#58a6ff]"></textarea>
+            </div>
+        </div>
+        <div class="flex justify-end gap-2 mt-5">
+            <button onclick="fecharModalPerfil()" class="px-3 py-1.5 bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-white text-xs rounded-md">Cancelar</button>
+            <button onclick="salvarPerfil()" class="px-3 py-1.5 bg-[#238636] hover:bg-[#2ea043] text-white font-semibold text-xs rounded-md">Salvar Perfil</button>
+        </div>
+    </div>
+</div>
+
+<!-- SCRIPTS -->
+<script>
+    const API_URL = 'http://localhost:8080';
+    let currentTab = 'OPEN';
+    let allTasksCache = [];
+
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            fecharModalIssue();
+            fecharModalPerfil();
+            document.getElementById('form-new-issue').classList.add('hidden');
+        }
+    });
+
+    function mostrarToast(mensagem, tipo = 'success') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `p-3 rounded-md text-xs font-medium flex items-center gap-2 shadow-lg border bg-[#161b22] text-white ${
+            tipo === 'success' ? 'border-[#238636]' : 'border-red-500'
+        }`;
+        toast.innerHTML = `<span>${tipo === 'success' ? '🟢' : '🔴'}</span> ${mensagem}`;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 3500);
+    }
+
+    function mudarParaCadastro() {
+        document.getElementById('reg-flash-error').classList.add('hidden');
+        document.getElementById('view-login').classList.add('hidden');
+        document.getElementById('view-cadastro').classList.remove('hidden');
+    }
+
+    function mudarParaLogin() {
+        document.getElementById('view-cadastro').classList.add('hidden');
+        document.getElementById('view-login').classList.remove('hidden');
+    }
+
+    async function fazerCadastro() {
+        const login = document.getElementById('reg-email').value;
+        const senha = document.getElementById('reg-senha').value;
+        const flashError = document.getElementById('reg-flash-error');
+        flashError.classList.add('hidden');
+
+        try {
+            const res = await fetch(`${API_URL}/auth/registro`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ login, senha })
+            });
+            if(res.ok) {
+                mostrarToast("Conta criada com sucesso!");
+                mudarParaLogin();
+            } else {
+                flashError.textContent = "Este login já existe ou dados inválidos.";
+                flashError.classList.remove('hidden');
+            }
+        } catch(e) {
+            flashError.textContent = "Erro de conexão com o servidor.";
+            flashError.classList.remove('hidden');
+        }
+    }
+
+    async function fazerLogin() {
+        const login = document.getElementById('login-email').value;
+        const senha = document.getElementById('login-senha').value;
+        const msg = document.getElementById('msg-login');
+
+        try {
+            const res = await fetch(`${API_URL}/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ login, senha })
+            });
+
+            if(res.ok) {
+                const data = await res.json();
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('userEmail', login);
+
+                document.getElementById('view-login').classList.add('hidden');
+                document.getElementById('view-cadastro').classList.add('hidden');
+                document.getElementById('view-dashboard').classList.remove('hidden');
+
+                carregarDadosPerfil(login);
+                carregarIssues();
+                mostrarToast("Login realizado com sucesso!");
+            } else {
+                throw new Error();
+            }
+        } catch(e) {
+            msg.className = "text-xs text-center mt-1 text-red-400";
+            msg.textContent = "Incorrect username or password.";
+        }
+    }
+
+    function fazerLogout() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userEmail');
+        document.getElementById('view-dashboard').classList.add('hidden');
+        document.getElementById('view-login').classList.remove('hidden');
+        mostrarToast("Sessão encerrada.");
+    }
+
+    function toggleNovaIssueForm() {
+        const form = document.getElementById('form-new-issue');
+        form.classList.toggle('hidden');
+        if(!form.classList.contains('hidden')) {
+            document.getElementById('new-issue-titulo').focus();
+        }
+    }
+
+    function checarAtalhoSubmit(e) {
+        if (e.ctrlKey && e.key === 'Enter') {
+            criarIssue();
+        }
+    }
+
+    async function carregarIssues() {
+        const token = localStorage.getItem('token');
+        const container = document.getElementById('issues-list-container');
+
+        try {
+            const res = await fetch(`${API_URL}/task`, {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if(res.ok) {
+                allTasksCache = await res.json();
+                renderizarLista();
+            } else {
+                container.innerHTML = '<div class="p-6 text-center text-red-400 text-xs">Sessão expirada. Faça login novamente.</div>';
+            }
+        } catch(e) {
+            container.innerHTML = '<div class="p-6 text-center text-red-400 text-xs">Erro ao conectar com o back-end.</div>';
+        }
+    }
+
+    function mudarAbaIssues(tab) {
+        currentTab = tab;
+        const openBtn = document.getElementById('tab-open');
+        const closedBtn = document.getElementById('tab-closed');
+        const searchFilter = document.getElementById('search-filter-label');
+
+        if (tab === 'OPEN') {
+            openBtn.className = "flex items-center gap-1 text-white font-semibold cursor-pointer";
+            closedBtn.className = "flex items-center gap-1 text-[#8b949e] hover:text-white font-normal cursor-pointer";
+            searchFilter.textContent = "state:open";
+        } else {
+            closedBtn.className = "flex items-center gap-1 text-white font-semibold cursor-pointer";
+            openBtn.className = "flex items-center gap-1 text-[#8b949e] hover:text-white font-normal cursor-pointer";
+            searchFilter.textContent = "state:closed";
+        }
+        renderizarLista();
+    }
+
+    function renderizarLista() {
+        const container = document.getElementById('issues-list-container');
+
+        const filtradas = allTasksCache.filter(t => {
+            const status = t.status || 'A_FAZER';
+            if (currentTab === 'OPEN') {
+                return status === 'A_FAZER' || status === 'EM_ANDAMENTO';
+            } else {
+                return status === 'CONCLUIDO';
+            }
+        });
+
+        const openCount = allTasksCache.filter(t => (t.status || 'A_FAZER') !== 'CONCLUIDO').length;
+        const closedCount = allTasksCache.filter(t => (t.status || 'A_FAZER') === 'CONCLUIDO').length;
+
+        document.getElementById('count-open').textContent = openCount;
+        document.getElementById('count-closed').textContent = closedCount;
+        document.getElementById('badge-total-issues').textContent = openCount;
+
+        if (filtradas.length === 0) {
+            container.innerHTML = `
+                <div class="p-12 text-center text-[#8b949e] flex flex-col items-center gap-2">
+                    <span class="text-2xl">✨</span>
+                    <p class="text-white text-xs font-semibold">No results matched your search.</p>
+                    <p class="text-[11px]">Crie uma nova issue usando o botão acima.</p>
+                </div>`;
+            return;
+        }
+
+        container.innerHTML = '';
+        filtradas.forEach(t => {
+            const status = t.status || 'A_FAZER';
+            const icone = status === 'CONCLUIDO' ? '🟣' : '🟢';
+            const dataFormatada = t.dataCriacao ? new Date(t.dataCriacao).toLocaleDateString('pt-BR') : '';
+            const emailUsuario = localStorage.getItem('userEmail') || 'dev';
+
+            container.innerHTML += `
+                <div class="p-3 flex items-center gap-3 hover:bg-[#1f6feb]/10 transition-colors cursor-pointer group" onclick='abrirDetalhesIssue(${JSON.stringify(t)})'>
+                    <span class="text-sm">${icone}</span>
+                    <div class="flex-1 flex flex-col gap-0.5">
+                        <span class="text-xs font-semibold text-white group-hover:text-[#58a6ff] transition-colors">${t.titulo}</span>
+                        <span class="text-[11px] text-[#8b949e]">#${t.id} opened on ${dataFormatada} by ${emailUsuario}</span>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    async function criarIssue() {
+        const token = localStorage.getItem('token');
+        const titulo = document.getElementById('new-issue-titulo').value;
+        const descricao = document.getElementById('new-issue-descricao').value;
+
+        if (!titulo.trim()) {
+            mostrarToast("O título é obrigatório!", "error");
+            return;
+        }
+
+        try {
+            const res = await fetch(`${API_URL}/task`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ titulo, descricao, status: 'A_FAZER' })
+            });
+
+            if(res.ok) {
+                document.getElementById('new-issue-titulo').value = '';
+                document.getElementById('new-issue-descricao').value = '';
+                toggleNovaIssueForm();
+                carregarIssues();
+                mostrarToast("Issue criada com sucesso!");
+            } else {
+                mostrarToast("Erro ao criar issue.", "error");
+            }
+        } catch(e) {
+            mostrarToast("Erro de conexão.", "error");
+        }
+    }
+
+    function abrirDetalhesIssue(task) {
+        document.getElementById('modal-issue-title').textContent = `${task.titulo} (#${task.id})`;
+        document.getElementById('modal-issue-desc').textContent = task.descricao || 'No description provided.';
+
+        const actionsContainer = document.getElementById('modal-actions-container');
+        actionsContainer.innerHTML = '';
+
+        const status = task.status || 'A_FAZER';
+        if (status !== 'CONCLUIDO') {
+            actionsContainer.innerHTML = `<button onclick="fecharIssue(${task.id}, '${task.titulo.replace(/'/g, "\\'")}', '${(task.descricao || '').replace(/'/g, "\\'")}')" class="px-3 py-1.5 bg-[#8957e5] hover:bg-[#8957e5]/80 text-white text-xs font-medium rounded-md">Close issue</button>`;
+        } else {
+            actionsContainer.innerHTML = `<button onclick="deletarIssue(${task.id})" class="px-3 py-1.5 bg-transparent border border-[#f85149] text-[#f85149] hover:bg-[#f85149] hover:text-white text-xs rounded-md transition-all">Delete issue</button>`;
+        }
+
+        document.getElementById('issue-modal').classList.remove('hidden');
+    }
+
+    function fecharModalIssue() {
+        document.getElementById('issue-modal').classList.add('hidden');
+    }
+
+    async function fecharIssue(id, titulo, descricao) {
+        const token = localStorage.getItem('token');
+        try {
+            const res = await fetch(`${API_URL}/task/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ titulo, descricao, status: 'CONCLUIDO' })
+            });
+
+            if(res.ok) {
+                fecharModalIssue();
+                carregarIssues();
+                mostrarToast("Issue fechada!");
+            } else {
+                mostrarToast("Erro ao fechar issue.", "error");
+            }
+        } catch(e) {
+            mostrarToast("Erro de conexão.", "error");
+        }
+    }
+
+    async function deletarIssue(id) {
+        const token = localStorage.getItem('token');
+        if(!confirm('Tem certeza que deseja deletar permanentemente esta issue?')) return;
+
+        try {
+            const res = await fetch(`${API_URL}/task/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if(res.ok) {
+                fecharModalIssue();
+                carregarIssues();
+                mostrarToast("Issue deletada!");
+            } else {
+                mostrarToast("Erro ao deletar issue.", "error");
+            }
+        } catch(e) {
+            mostrarToast("Erro de conexão.", "error");
+        }
+    }
+
+    // PERFIL
+    function abrirModalPerfil() {
+        const email = localStorage.getItem('userEmail') || 'dev@github.com';
+        const savedProfile = JSON.parse(localStorage.getItem(`profile_${email}`)) || { avatar: '', bio: '' };
+
+        document.getElementById('profile-modal-email').textContent = email;
+        document.getElementById('profile-input-avatar').value = savedProfile.avatar;
+        document.getElementById('profile-input-bio').value = savedProfile.bio;
+        document.getElementById('profile-modal-avatar-preview').src = savedProfile.avatar || 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png';
+
+        document.getElementById('profile-modal').classList.remove('hidden');
+    }
+
+    function fecharModalPerfil() {
+        document.getElementById('profile-modal').classList.add('hidden');
+    }
+
+    function salvarPerfil() {
+        const email = localStorage.getItem('userEmail');
+        const avatar = document.getElementById('profile-input-avatar').value;
+        const bio = document.getElementById('profile-input-bio').value;
+
+        localStorage.setItem(`profile_${email}`, JSON.stringify({ avatar, bio }));
+        carregarDadosPerfil(email);
+        fecharModalPerfil();
+        mostrarToast("Perfil atualizado!");
+    }
+
+    function carregarDadosPerfil(email) {
+        const savedProfile = JSON.parse(localStorage.getItem(`profile_${email}`)) || { avatar: '', bio: '' };
+        const username = email.split('@')[0];
+        document.getElementById('nav-username-label').textContent = username;
+        document.getElementById('sidebar-email').textContent = email;
+
+        if (savedProfile.avatar) {
+            document.getElementById('nav-user-avatar').src = savedProfile.avatar;
+            document.getElementById('sidebar-mini-avatar').src = savedProfile.avatar;
+        } else {
+            const defaultAvatar = 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png';
+            document.getElementById('nav-user-avatar').src = defaultAvatar;
+            document.getElementById('sidebar-mini-avatar').src = defaultAvatar;
+        }
+
+        if (savedProfile.bio) {
+            document.getElementById('sidebar-bio').textContent = savedProfile.bio;
+        } else {
+            document.getElementById('sidebar-bio').textContent = "Nenhuma bio cadastrada.";
+        }
+    }
+</script>
+</body>
+</html>
