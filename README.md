@@ -1,4 +1,4 @@
-PI REST desenvolvida em Java para gerenciamento de usuários e autenticação segura baseada em tokens. O projeto implementa um sistema completo de controle de acesso (CRUD de usuários) aliado a um fluxo robusto de autenticação via JSON Web Token (JWT), garantindo que apenas usuários autenticados possam acessar rotas protegidas.
+API REST desenvolvida em Java para gerenciamento de usuários e autenticação segura baseada em tokens. O projeto implementa um sistema completo de controle de acesso (CRUD de usuários) aliado a um fluxo robusto de autenticação via JSON Web Token (JWT), garantindo que apenas usuários autenticados possam acessar rotas protegidas.
 
 Funcionalidades
 Gerenciamento de Usuários: Cadastro, atualização, consulta e exclusão de contas.
@@ -19,7 +19,7 @@ Lombok
 Validation
 
  Boas Práticas e Arquitetura
-O projeto foi construído seguindo padrões de mercado e arquitetura limpa:
+O projeto foi construído seguindo padrões de mercado e arquitetura limpa
 
 Senhas Criptografadas: As senhas nunca são salvas em texto plano no banco de dados;
 o Spring Security utiliza o BCryptPasswordEncoder para o hash seguro.
